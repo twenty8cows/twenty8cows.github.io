@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+
+    <div class="banner">
+        <img src="{{ url_for('static', filename='images/Banner_images/Banner-1.png') }}" class="active" alt="Banner Image 1">
+        <img src="{{ url_for('static', filename='images/Banner_images/Banner-2.png') }}" alt="Banner Image 2">
+        <img src="{{ url_for('static', filename='images/Banner_images/Banner-3.png') }}" alt="Banner Image 3">
+        <img src="{{ url_for('static', filename='images/Banner_images/Banner-4.png') }}" alt="Banner Image 4">
+    </div>
+
+    <h1>Welcome to the Herd!</h1>
+    <p>Hello, my name is Twenty8cows and welcome to my website! This project was inspired by my search for quality cannabis products without going to each dispensary website. I wanted the ability to just pick a category for the flavor of weed I wanted and boom! I'm looking at a list of products. From that came this! Pick from the dropdown options what you are looking for and let me do the rest! Thanks for being here. If you get any use from this tool, consider buying me a cup of coffee!</p>
+
+    <div class="container">
+        <div class="form-container">
+            <form action="/db-page" method="get">
+                <h2>Product Search Tool</h2>
+                <label for="dispensary">Dispensary:</label>
+                <select id="dispensary" name="dispensary" onchange="fetchStores()">
+                    <option value="">Select Dispensary</option>
+                    {% for dispensary in dispensaries %}
+                    <option value="{{ dispensary }}">{{ dispensary }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="category">Category:</label>
+                <select id="category" name="category">
+                    <option value="">Select Category</option>
+                    {% for category in categories %}
+                    <option value="{{ category }}">{{ category }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="store_name">Store Name:</label>
+                <select id="store_name" name="store_name">
+                    <option value="">Select Store</option>
+                </select>
+
+                <label for="sort">Sort By:</label>
+                <select id="sort" name="sort">
+                    <option value="">Select Sorting Option</option>
+                    <option value="product_potency_asc">Potency (Low to High)</option>
+                    <option value="product_potency_desc">Potency (High to Low)</option>
+                    <option value="product_price_asc">Price (Low to High)</option>
+                    <option value="product_price_desc">Price (High to Low)</option>
+                    <option value="product_size_asc">Size (Low to High)</option>
+                    <option value="product_size_desc">Size (High to Low)</option>
+                </select>
+
+                <label for="limit">Limit:</label>
+                <select name="limit" id="limit">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <div class="login-form-container">
+            <form method="POST" action="/login" class="login-form">
+                <h2>Log in</h2>
+                <input type="text" name="Username" id="username" placeholder="Enter username"><br>
+                <input type="password" name="password" id="password_box" placeholder="Enter password"><br>
+                <input type="submit" name="submit_btn" id="submit_btn" value="Submit">
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function fetchStores() {
+            const dispensary = document.getElementById('dispensary').value;
+            fetch(`/stores?dispensary=${dispensary}`)
+                .then(response => response.json())
+                .then(data => {
+                    const storeSelect = document.getElementById('store_name');
+                    storeSelect.innerHTML = '<option value="">Select Store</option>';
+                    data.stores.forEach(store => {
+                        const option = document.createElement('option');
+                        option.value = store;
+                        option.textContent = store;
+                        storeSelect.appendChild(option);
+                    });
+                });
+        }
+
+        // JavaScript to rotate banner images every 5 seconds
+        let currentImageIndex = 0;
+        const images = document.querySelectorAll('.banner img');
+        setInterval(() => {
+            images[currentImageIndex].classList.remove('active');
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            images[currentImageIndex].classList.add('active');
+        }, 5000);
+    </script>
+<footer class="footer">
+    <h3><a href="https://www.paypal.com/ncp/payment/JCNUAV33YGFVA">Donate here</a></h3>
+    <p><a href="{{ url_for('contact') }}">Contact Me</a></p>
+    <p><a href="/report-issue">Report an issue</a></p>
+    <p><a href="/feedback">Have a feature request? Give Feedback</a></p>
+</footer>
+</body>
+</html>
